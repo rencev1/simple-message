@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>trixie</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Playfair+Display:ital@0;1&family=Poppins:wght@300;400;600&family=Courier+Prime&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --deep-purple: #0b0033;
+            --mid-purple: #13096c;
+            --light-purple: #4e50dd;
+            --glass: rgba(255, 255, 255, 0.08);
+            --error-red: #ff4d4d;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background: radial-gradient(circle at center, var(--mid-purple), var(--deep-purple));
+            font-family: 'Poppins', sans-serif;
+            color: white;
+        }
+
+        /* Music is now hidden */
+        #music-container {
+            display: none;
+        }
+
+        /* Sparkles */
+        .sparkle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            filter: blur(1px);
+            animation: fly linear infinite;
+        }
+
+        @keyframes fly {
+            0% { transform: translateY(0) scale(0); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-100vh) scale(1); opacity: 0; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+            max-width: 600px;
+            width: 85%;
+            margin: auto;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .question {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.8rem;
+            color: #acaaff;
+            margin-bottom: 20px;
+        }
+
+        #quiz-question {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.3rem;
+            color: #ffffff;
+            line-height: 1.4;
+            margin-bottom: 25px;
+        }
+
+        button {
+            padding: 12px 35px;
+            margin: 10px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .yes { background: #4e68dd; color: white; box-shadow: 0 5px 15px rgba(157, 78, 221, 0.4); }
+        .no { background: transparent; color: #7d86ff; border: 1px solid #997dff; }
+        
+        input {
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid #504edd;
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            width: 85%;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            outline: none;
+            text-align: center;
+        }
+
+        #quiz-stage, #glitch-stage, #jk-stage, #intro-stage {
+            transition: opacity 0.8s ease-in-out;
+        }
+
+        #glitch-stage {
+            text-align: left;
+            font-family: 'Courier Prime', monospace;
+            color: var(--error-red);
+            display: none;
+            opacity: 0;
+        }
+
+        .fake-img {
+            width: 100%;
+            height: 150px;
+            border: 2px dashed var(--error-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0;
+            background: rgba(255, 0, 0, 0.05);
+        }
+
+        #letter {
+            display: none;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: #e5ecf5;
+            text-align: left;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 25px;
+            border-radius: 20px;
+            margin-top: 20px;
+            max-height: 350px;
+            overflow-y: auto;
+            white-space: pre-line;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+        }
+    </style>
+</head>
+<body>
+
+<audio id="bg-music" loop>
+    <source src="Amiel Sol - Ikaw Lang Patutunguhan (Official Lyric Visualizer).mp3" type="audio/mpeg">
+</audio>
+
+<div id="sparkle-field"></div>
+
+<div class="container" id="mainContainer">
+
+    <div id="intro-stage">
+        <div class="question">Congratulations!</div>
+        <p style="color:#7d7fff; font-style:italic;">Will you open my letter?</p>
+        <div class="btn-group">
+            <button class="yes" onclick="startQuiz()">Yes</button>
+            <button class="no" id="noBtn" onmouseover="moveNo()">No</button>
+        </div>
+    </div>
+
+    <div id="quiz-stage" style="display:none; opacity:0;">
+        <div id="quiz-question"></div>
+        <input type="text" id="quiz-input" placeholder="Your answer...">
+        <br>
+        <button class="yes" onclick="nextQuestion()">Next </button>
+    </div>
+
+    <div id="glitch-stage">
+        <p>> LOADING ASSETS... [ERROR]</p>
+        <p>> DATABASE_TIMEOUT: 404</p>
+        <div class="fake-img">UNABLE TO LOAD CONTENT</div>
+        <p>> SYSTEM FAILURE... REBOOTING...</p>
+    </div>
+
+    <div id="jk-stage" style="display:none; opacity:0;">
+        <div class="question" style="font-size: 3rem;">Just kidding</div>
+        <p style="color:#aaacff;">Kala mo error no, Everything is still here.</p>
+    </div>
+
+    <div id="letter"></div>
+
+</div>
+
+<script>
+    const music = document.getElementById('bg-music');
+
+    /* BACKGROUND SPARKLES */
+    function createSparkle(){
+        const field=document.getElementById('sparkle-field');
+        const sparkle=document.createElement('div');
+        sparkle.className='sparkle';
+        const size=Math.random()*4+1;
+        sparkle.style.width=size+'px'; sparkle.style.height=size+'px';
+        sparkle.style.left=Math.random()*100+'vw';
+        sparkle.style.bottom="-10px";
+        const duration=Math.random()*3+2;
+        sparkle.style.animationDuration=duration+'s';
+        field.appendChild(sparkle);
+        setTimeout(()=>sparkle.remove(),duration*1000);
+    }
+    setInterval(createSparkle, 150);
+
+    /* NO BUTTON ESCAPE */
+    function moveNo(){
+        const btn=document.getElementById('noBtn');
+        btn.style.position='fixed';
+        btn.style.left=Math.random()*(window.innerWidth-100)+'px';
+        btn.style.top=Math.random()*(window.innerHeight-50)+'px';
+    }
+
+    /* Q&A CONFIGURATION */
+    const questions = [
+        "Do, how are you feeling right now, knowing that tomorrow you’ll officially graduate?",
+        "What’s the first thing you want to do or achieve once you start your college journey?",
+        "Who’s the person you want to thank the most for helping you reach this day?",
+        "When you look back at all the effort you gave, what’s the part of your journey that makes you proudest?"
+    ];
+    let currentQ = 0;
+
+    function startQuiz() {
+        // Music plays silently in the background once "Yes" is clicked
+        music.play().catch(() => {
+            console.log("Autoplay prevented by browser.");
+        });
+        
+        fadeOut('intro-stage', () => {
+            fadeIn('quiz-stage');
+            updateQuestion();
+        });
+    }
+
+    function updateQuestion() {
+        if (currentQ < questions.length) {
+            document.getElementById('quiz-question').innerText = questions[currentQ];
+            document.getElementById('quiz-input').value = "";
+        } else {
+            triggerGlitch();
+        }
+    }
+
+    function nextQuestion() {
+        currentQ++;
+        updateQuestion();
+    }
+
+    /* SMOOTH TRANSITIONS */
+    function fadeOut(id, callback) {
+        const el = document.getElementById(id);
+        el.style.opacity = '0';
+        setTimeout(() => {
+            el.style.display = 'none';
+            if(callback) callback();
+        }, 800);
+    }
+
+    function fadeIn(id) {
+        const el = document.getElementById(id);
+        el.style.display = 'block';
+        setTimeout(() => { el.style.opacity = '1'; }, 50);
+    }
+
+    function triggerGlitch() {
+        fadeOut('quiz-stage', () => {
+            fadeIn('glitch-stage');
+            setTimeout(() => {
+                fadeOut('glitch-stage', () => {
+                    fadeIn('jk-stage');
+                    setTimeout(() => {
+                        fadeOut('jk-stage', () => {
+                            const letter = document.getElementById('letter');
+                            letter.style.display = 'block';
+                            setTimeout(() => {
+                                letter.style.opacity = '1';
+                                typeWriter(message, 0);
+                            }, 100);
+                        });
+                    }, 2500);
+                });
+            }, 3500);
+        });
+    }
+
+const message = `Hi Do,
+
+Congratulations, graduate ka na!  I’m so proud of you. Kahit isang buwan pa lang tayong magkakilala, I already see how much effort you gave to reach this day. You really did your best, and now you’re starting your college journey.
+
+I was making this letter for you. This is something I’m a bit good at coding and writing things like this. You also know that I don’t have any material gift to give right now. I’m really broke at the moment, and honestly it hurts and embarrasses me because I wanted to give you something special but I can’t. So this is the only way I can show you how important you are to me.
+
+I’m sorry if I couldn’t give you flowers today. It hurts me to think na halos lahat may bouquet, tapos ikaw wala galing sakin. But please know, my presence here and my pride in you are bigger than any gift.
+
+Do, I’ll always be here cheering for you. `;
+
+    function typeWriter(text, i) {
+        if (i < text.length) {
+            document.getElementById("letter").innerHTML = text.substring(0, i + 1);
+            setTimeout(() => typeWriter(text, i + 1), 45);
+        }
+    }
+</script>
+
+</body>
+</html>
